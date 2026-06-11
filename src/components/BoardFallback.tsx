@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import RoomCapacityPanel from "./RoomCapacityPanel";
 
 export default function BoardFallback({ assignments, stats, data, onMove }) {
@@ -10,7 +10,6 @@ export default function BoardFallback({ assignments, stats, data, onMove }) {
     [stats]
   );
 
-  // Build per-session clash-partner lookup from the clashPairs map
   const clashPartners = useMemo(() => {
     const map = new Map<string, { partnerId: string; partnerTitle: string; count: number }[]>();
     if (!stats.clashPairs) return map;
@@ -43,96 +42,71 @@ export default function BoardFallback({ assignments, stats, data, onMove }) {
         utilization={stats.utilization}
       />
 
+      {/* Standard calendar: rooms = columns, time = rows */}
       <div
-        className="fb-grid"
-        style={{ gridTemplateColumns: `150px repeat(${data.slots.length}, 1fr)` }}
+        className="fb-cal"
+        style={{ gridTemplateColumns: `64px repeat(${data.rooms.length}, 1fr)` }}
       >
-        {/* Column headers */}
-        <div className="fb-corner" />
-        {data.slots.map((sl) => (
-          <div key={sl.label} className="fb-slot-head">{sl.label}</div>
+        {/* ── Header row: corner + room names ── */}
+        <div className="fb-cal-corner" />
+        {data.rooms.map((room) => (
+          <div key={room.id} className="fb-cal-room-head">
+            <span className="fb-cal-room-bar" style={{ background: room.color }} />
+            <span className="fb-cal-room-name">{room.name}</span>
+            <span className="fb-cal-room-cap">{room.capacity} seats</span>
+          </div>
         ))}
 
-        {/* Room rows */}
-        {data.rooms.map((room, ri) => (
-          <RoomRow
-            key={room.id}
-            room={room}
-            slots={data.slots}
-            cellSession={cellSession}
-            demand={data.demand}
-            overflowIds={overflowIds}
-            clashPartners={clashPartners}
-            utilization={stats.utilization[ri]}
-            dragId={dragId}
-            hover={hover}
-            setDragId={setDragId}
-            setHover={setHover}
-            onMove={onMove}
-          />
+        {/* ── Time rows ── */}
+        {data.slots.map((slot, si) => (
+          <Fragment key={si}>
+            <div className="fb-cal-time">{slot.label}</div>
+
+            {data.rooms.map((room, ri) => {
+              const s    = cellSession(room.id, si);
+              const key  = `${room.id}:${si}`;
+              const util = stats.utilization[ri][si];
+              const remaining = room.capacity - (util?.expected ?? 0);
+
+              return (
+                <div
+                  key={key}
+                  className={`fb-cal-cell ${hover === key ? "fb-cal-hover" : ""}`}
+                  onDragOver={(e) => { e.preventDefault(); setHover(key); }}
+                  onDragLeave={() => setHover((h) => (h === key ? null : h))}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setHover(null);
+                    if (dragId) onMove(dragId, room.id, si);
+                    setDragId(null);
+                  }}
+                >
+                  {s ? (
+                    <SessionCard
+                      session={s}
+                      room={room}
+                      demand={data.demand}
+                      overflowIds={overflowIds}
+                      clashPartners={clashPartners}
+                      remaining={remaining}
+                      dragId={dragId}
+                      setDragId={setDragId}
+                      setHover={setHover}
+                    />
+                  ) : (
+                    <div className="fb-cal-empty" />
+                  )}
+                </div>
+              );
+            })}
+          </Fragment>
         ))}
       </div>
 
-      <p className="board-hint">
-        Drag a session card to any cell — drop on an occupied cell to swap. Scores update instantly.
+      <p className="board-hint" style={{ color: "rgba(255,255,255,0.28)", marginTop: 10 }}>
+        Drag a session to any cell — drop on an occupied cell to swap. Scores update instantly.
       </p>
     </div>
-  );
-}
-
-function RoomRow({
-  room, slots, cellSession, demand, overflowIds, clashPartners,
-  utilization, dragId, hover, setDragId, setHover, onMove,
-}) {
-  return (
-    <>
-      {/* Room header cell */}
-      <div className="fb-room-head">
-        <div className="fb-room-name">{room.name}</div>
-        <div className="fb-room-cap">{room.capacity} seats</div>
-      </div>
-
-      {slots.map((_, slot) => {
-        const s   = cellSession(room.id, slot);
-        const key = `${room.id}:${slot}`;
-        const util = utilization[slot]; // { expected, capacity, pct }
-        const remaining = room.capacity - (util?.expected ?? 0);
-
-        return (
-          <div
-            key={key}
-            className={`fb-cell ${hover === key ? "fb-cell-hover" : ""}`}
-            onDragOver={(e) => { e.preventDefault(); setHover(key); }}
-            onDragLeave={() => setHover((h) => (h === key ? null : h))}
-            onDrop={(e) => {
-              e.preventDefault();
-              setHover(null);
-              if (dragId) onMove(dragId, room.id, slot);
-              setDragId(null);
-            }}
-          >
-            {s ? (
-              <SessionCard
-                session={s}
-                room={room}
-                demand={demand}
-                overflowIds={overflowIds}
-                clashPartners={clashPartners}
-                remaining={remaining}
-                dragId={dragId}
-                setDragId={setDragId}
-                setHover={setHover}
-              />
-            ) : (
-              <div className="fb-empty">
-                <div className="fb-empty-cap">{room.capacity}</div>
-                <div className="fb-empty-label">seats free</div>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </>
   );
 }
 
@@ -142,6 +116,7 @@ function SessionCard({ session: s, room, demand, overflowIds, clashPartners, rem
   const isOver   = overflowIds.has(s.id);
   const partners = clashPartners.get(s.id) ?? [];
   const topClash = partners[0] ?? null;
+  const fillPct  = Math.min(100, Math.round((expected / room.capacity) * 100));
 
   return (
     <div
@@ -154,28 +129,23 @@ function SessionCard({ session: s, room, demand, overflowIds, clashPartners, rem
       <div className="fb-card-title">{s.title}</div>
       <div className="fb-card-meta">{s.speaker}</div>
 
-      {/* Registered / expected counts */}
       <div className="fb-card-demand">
-        <span className="fb-reg">{reg.toLocaleString()} registered</span>
-        <span className={`fb-exp ${isOver ? "fb-exp-over" : ""}`}>{expected} expected</span>
+        <span className="fb-reg">{reg.toLocaleString()} reg</span>
+        <span className={`fb-exp ${isOver ? "fb-exp-over" : ""}`}>{expected} exp</span>
       </div>
 
-      {/* Remaining-seats bar */}
       <div className={`fb-cap-bar ${isOver ? "fb-cap-bar-over" : ""}`}>
-        <div
-          className="fb-cap-fill"
-          style={{ width: `${Math.min(100, Math.round((expected / room.capacity) * 100))}%` }}
-        />
-      </div>
-      <div className={`fb-rem ${isOver ? "fb-rem-over" : remaining < 20 ? "fb-rem-warn" : "fb-rem-ok"}`}>
-        {isOver ? `⛔ ${-remaining} over capacity` : `${remaining} seats remaining`}
+        <div className="fb-cap-fill" style={{ width: `${fillPct}%` }} />
       </div>
 
-      {/* Clash partner badge */}
+      <div className={`fb-rem ${isOver ? "fb-rem-over" : remaining < 20 ? "fb-rem-warn" : "fb-rem-ok"}`}>
+        {isOver ? `⛔ ${-remaining} over` : `${remaining} seats left`}
+      </div>
+
       {topClash && (
         <div className="fb-flag fb-flag-clash">
-          ⚡ Clashes with {topClash.partnerTitle.length > 22
-            ? topClash.partnerTitle.substring(0, 22) + "…"
+          ⚡ {topClash.partnerTitle.length > 20
+            ? topClash.partnerTitle.substring(0, 20) + "…"
             : topClash.partnerTitle} ({topClash.count})
         </div>
       )}

@@ -300,82 +300,211 @@ body {
 
 
 /* ══════════════════════════════════════════════════════════════
-   FALLBACK BOARD
+   FALLBACK BOARD — dark glass calendar (time=rows, rooms=columns)
 ══════════════════════════════════════════════════════════════ */
 .fb-board { overflow-x: auto; }
-.fb-grid { display: grid; gap: 6px; min-width: 920px; }
 
-.fb-slot-head {
+/* Calendar grid */
+.fb-cal {
+  display: grid;
+  min-width: 680px;
+  background: #0A0918;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.07);
+  /* Thin grid lines via gap + matching background */
+  gap: 1px;
+}
+
+/* Top-left corner */
+.fb-cal-corner {
+  background: #0A0918;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Room header cells (top row) */
+.fb-cal-room-head {
+  background: #0A0918;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fb-cal-room-bar {
+  width: 36px;
+  height: 3px;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  display: block;
+}
+.fb-cal-room-name {
   font-family: "Sora", sans-serif;
-  font-weight: 600; font-size: 11.5px;
-  text-align: center; color: #9B96B0;
-  padding: 6px 0;
-  text-transform: uppercase; letter-spacing: .05em;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: .01em;
 }
-.fb-room-head {
-  padding: 10px 12px;
-  align-self: stretch;
-  display: flex; flex-direction: column; justify-content: center;
-  border-right: 2px solid #E8E5E0;
+.fb-cal-room-cap {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: .03em;
 }
-.fb-room-name { font-family: "Sora", sans-serif; font-weight: 700; font-size: 13px; }
-.fb-room-cap  { font-size: 11px; color: #9B96B0; margin-top: 2px; }
 
-.fb-cell {
-  background: #F2F0EA;
-  border-radius: 10px;
-  min-height: 100px; padding: 4px;
-  transition: background 110ms, outline 110ms;
+/* Time label cells (left column) */
+.fb-cal-time {
+  font-family: "Sora", sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.28);
+  background: #0A0918;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 14px;
+  letter-spacing: .02em;
 }
-.fb-cell-hover { background: #EAE4FF; outline: 2px dashed var(--violet); }
-.fb-empty { color: #C8C4D8; font-size: 11px; text-align: center; padding-top: 36px; }
 
-.fb-card {
-  background: var(--card);
-  border-radius: 8px;
-  padding: 8px 10px;
-  height: 100%;
-  cursor: grab;
-  border-left: 4px solid #C9C5DC;
-  box-shadow: var(--shadow-sm);
+/* Data cells */
+.fb-cal-cell {
+  background: #0D0B1E;
+  min-height: 108px;
+  padding: 5px;
   position: relative;
-  transition: transform 120ms, box-shadow 120ms;
+  transition: background 100ms;
 }
-.fb-card:hover  { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.fb-card:active { cursor: grabbing; transform: translateY(0); }
-.fb-dragging    { opacity: .3; }
+.fb-cal-hover {
+  background: rgba(124,92,255,0.1) !important;
+  box-shadow: inset 0 0 0 2px rgba(124,92,255,0.45);
+}
+.fb-cal-empty { width: 100%; height: 100%; min-height: 100px; }
 
-.fb-card-title { font-size: 11.5px; font-weight: 600; line-height: 1.3; color: #1A1730; }
-.fb-card-meta  { font-size: 10.5px; color: #9B96B0; margin-top: 3px; }
-.fb-card-foot  { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; align-items: center; }
-.fb-track      { color: #9B96B0; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
-.fb-load       { font-variant-numeric: tabular-nums; color: #059669; font-weight: 700; }
-.fb-load-over  { color: #DC2626; font-weight: 700; }
+/* ── Session cards ── */
+.fb-card {
+  border-radius: 9px;
+  padding: 10px 12px 8px;
+  height: 100%;
+  min-height: 96px;
+  cursor: grab;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-left: 3px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.07);
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+}
+.fb-card:hover {
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+  background: rgba(255,255,255,0.11);
+}
+.fb-card:active  { cursor: grabbing; transform: scale(0.98); }
+.fb-dragging     { opacity: 0.18; transform: scale(0.96) !important; box-shadow: none !important; }
 
+/* Track-colored gradient cards */
+.track-ai {
+  border-left-color: #7C5CFF;
+  background: linear-gradient(140deg, rgba(124,92,255,0.2) 0%, rgba(255,255,255,0.05) 60%);
+}
+.track-web {
+  border-left-color: #2AA7A0;
+  background: linear-gradient(140deg, rgba(42,167,160,0.2) 0%, rgba(255,255,255,0.05) 60%);
+}
+.track-data {
+  border-left-color: #10B981;
+  background: linear-gradient(140deg, rgba(16,185,129,0.2) 0%, rgba(255,255,255,0.05) 60%);
+}
+.track-career {
+  border-left-color: #F59E0B;
+  background: linear-gradient(140deg, rgba(245,158,11,0.2) 0%, rgba(255,255,255,0.05) 60%);
+}
+
+/* Overflow card — red pulse glow */
+.fb-overflow {
+  border-left-color: #E5484D !important;
+  border-color: rgba(229,72,77,0.3) !important;
+  background: linear-gradient(140deg, rgba(229,72,77,0.22) 0%, rgba(255,255,255,0.04) 60%) !important;
+  box-shadow: 0 0 0 1px rgba(229,72,77,0.25), 0 0 20px rgba(229,72,77,0.14) !important;
+  animation: glow-bad 2s ease-in-out infinite;
+}
+
+/* Clash card — amber ring */
+.fb-clash {
+  box-shadow: 0 0 0 2px #F59E0B, 0 0 14px rgba(245,158,11,0.22) !important;
+  animation: glow-warn 2s ease-in-out infinite;
+}
+
+/* Card text — white on dark */
+.fb-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: rgba(255,255,255,0.92);
+  margin-bottom: 3px;
+}
+.fb-card-meta {
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 0;
+}
+.fb-card-demand {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 7px;
+  font-size: 10.5px;
+}
+.fb-reg { color: rgba(255,255,255,0.35); font-weight: 500; }
+.fb-exp { font-weight: 700; color: rgba(255,255,255,0.65); }
+.fb-exp-over { color: #FC8181; }
+
+/* Capacity bar */
+.fb-cap-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.fb-cap-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.25);
+  transition: width 400ms cubic-bezier(.22,1,.36,1);
+}
+.track-ai     .fb-cap-fill { background: #7C5CFF; }
+.track-web    .fb-cap-fill { background: #2AA7A0; }
+.track-data   .fb-cap-fill { background: #10B981; }
+.track-career .fb-cap-fill { background: #F59E0B; }
+.fb-cap-bar-over .fb-cap-fill { background: #E5484D !important; }
+
+/* Remaining seats */
+.fb-rem { font-size: 9.5px; font-weight: 600; margin-top: 4px; }
+.fb-rem-ok   { color: rgba(255,255,255,0.25); }
+.fb-rem-warn { color: #FCD34D; }
+.fb-rem-over { color: #FC8181; }
+
+/* Flags (clash/overflow badges) */
 .fb-flag {
-  font-size: 9.5px; font-weight: 700; color: #DC2626;
-  margin-top: 4px; background: rgba(220,38,38,.09);
-  border-radius: 4px; padding: 1px 6px; display: inline-block;
+  display: inline-block;
+  font-size: 9px; font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 5px;
+  color: #FCA5A5;
+  background: rgba(239,68,68,0.22);
   animation: badge-pop .25s ease;
 }
-.fb-flag-clash { color: #92400E; background: rgba(245,158,11,.12); }
+.fb-flag-clash { color: #FDE68A; background: rgba(245,158,11,0.22); }
 
-/* Track accent colours */
-.track-ai     { border-left-color: #7C5CFF; }
-.track-web    { border-left-color: #0EA5E9; }
-.track-data   { border-left-color: #F97316; }
-.track-career { border-left-color: #EC4899; }
-
-/* Overflow card */
-.fb-overflow {
-  background: linear-gradient(135deg, #FEF2F2, #FFF5F5) !important;
-  border-left-color: var(--coral) !important;
-  box-shadow: 0 0 0 1px rgba(229,72,77,.2), 0 2px 6px rgba(229,72,77,.14) !important;
+/* Empty cell placeholder */
+.fb-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  height: 100%; min-height: 96px;
 }
-/* Clash card */
-.fb-clash {
-  box-shadow: 0 0 0 2px var(--amber), 0 2px 6px rgba(245,158,11,.2) !important;
-}
+.fb-empty-cap   { font-family: "Sora", sans-serif; font-weight: 700; font-size: 18px; color: rgba(255,255,255,0.07); }
+.fb-empty-label { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; margin-top: 2px; color: rgba(255,255,255,0.1); }
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -620,45 +749,6 @@ body {
 .rcp-sum-over { color: #C73A3F; }
 
 
-/* ══════════════════════════════════════════════════════════════
-   BOARD CARD — demand + capacity enhancements
-══════════════════════════════════════════════════════════════ */
-.fb-card-demand {
-  display: flex; justify-content: space-between;
-  margin-top: 5px; font-size: 10.5px;
-}
-.fb-reg  { color: #6D6884; font-weight: 500; }
-.fb-exp  { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
-.fb-exp-over { color: var(--coral); }
-
-/* Capacity bar */
-.fb-cap-bar {
-  height: 4px; background: rgba(12,10,30,.08);
-  border-radius: 99px; margin-top: 5px; overflow: hidden;
-}
-.fb-cap-bar-over .fb-cap-fill { background: var(--coral); }
-.fb-cap-fill {
-  height: 100%; border-radius: 99px;
-  background: linear-gradient(90deg, #10B981, #34D399);
-  transition: width 400ms cubic-bezier(.22,1,.36,1);
-}
-
-.fb-rem {
-  font-size: 10px; font-weight: 600; margin-top: 4px;
-}
-.fb-rem-ok   { color: #047857; }
-.fb-rem-warn { color: #92400E; }
-.fb-rem-over { color: #DC2626; }
-
-/* Empty cell */
-.fb-empty {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  height: 100%; min-height: 80px;
-  color: #C8C4D8;
-}
-.fb-empty-cap   { font-family: "Sora", sans-serif; font-weight: 700; font-size: 20px; }
-.fb-empty-label { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; margin-top: 2px; }
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -701,11 +791,12 @@ body {
    Journey Mode — two-panel layout
 ══════════════════════════════════════════════════════════════ */
 
-/* Master-detail split */
+/* Master-detail split — fills viewport below header + tabs (~210px) */
 .journey-layout {
   display: grid;
   grid-template-columns: 272px 1fr;
-  min-height: calc(100vh - 260px);
+  height: calc(100vh - 210px);
+  overflow: hidden;
   border-top: 1px solid #E4E2ED;
 }
 
@@ -714,6 +805,7 @@ body {
   border-right: 1px solid #E4E2ED;
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -824,10 +916,11 @@ body {
 /* ── Right detail panel ── */
 .journey-detail {
   overflow-y: auto;
+  height: 100%;
 }
 .jdetail-wrap {
   padding: 20px 24px 32px;
-  max-width: 720px;
+  max-width: 900px;
 }
 
 /* Detail header (persona card in right panel) */
