@@ -1,56 +1,105 @@
-# Slotwise — agendas built on demand, not guesswork
+# Slotwise — demand-aware conference agenda builder
 
-Conference agendas are built in spreadsheets, blind to the demand data that registration
-already captured. Slotwise lets organisers drag sessions on a board and watch attendee
-clashes and room overflows resolve **live** — 1,200 real preference sets re-scored on every drop.
+Multi-track event agendas are built in spreadsheets, blind to the preference data that
+registration already captured. Result: the two most popular talks clash, a 289-person
+session gets an 80-seat room, and attendees discover it on event day.
 
-## Quick start
+**Slotwise** lets organisers drag sessions on a scheduling board and watch attendee
+clashes and room overflows resolve **live** — 1,200 attendee preference sets re-scored
+on every drop, one animation frame per drag.
+
+---
+
+## Setup (3 commands)
 
 ```bash
-npm install
-# Activate your Kendo trial license (DO THIS FIRST — unlicensed = watermark banner):
-#   1. Sign up free at telerik.com → get trial → grab your license file/key
-#   2. npx kendo-ui-license activate   (after placing the key per their docs)
+npm ci
+# Activate your Kendo license (free trial at telerik.com → npx kendo-ui-license activate)
 npm run dev
-npm run verify-demo   # prints the exact rehearsed drag path + numbers
 ```
 
-## What's already done (and TESTED — don't rewrite these)
-- `src/engine/clash.js` — pure scoring engine. Verified by `scripts/verify_demo.mjs`.
-- `src/data/seed.js` — deterministic seed (1,200 attendees, seeded RNG → identical
-  numbers on every machine). `INITIAL_ASSIGNMENTS` is GOOD layout + 3 deliberate sins;
-  `DEMO_MOVES` undoes them. **Do not "improve" the seed — the demo numbers depend on it.**
-- All components, styles, and the fallback board.
+The app loads with a deliberately broken agenda (**729 attendees impacted, 3 overflows**).
+Run `npm run verify-demo` to confirm the exact demo drag path.
 
-## What needs YOUR hours (in order)
-1. **`npm install` + license + `npm run dev`** — get it rendering. (~30 min)
-2. **SchedulerBoard.tsx** — the only risky file. Kendo Scheduler drag across room
-   resources + the `onDataChange` mapping may need API fixes against current Kendo docs.
-   **Hard 90-minute budget.** If you blow it: in `App.tsx`, swap the import to
-   `BoardFallback` (one line, same props, already styled, works today) and move on.
-   Kendo still powers Tabs, Grid, Charts, Notifications — say so in the writeup.
-3. **Rehearse** — run `npm run verify-demo`, do the 3 drags in the UI, confirm the
-   header collapses 729 → 186 and overflows hit 0.
-4. **Record the backup video, write the submission, screenshot everything.**
+---
 
-## Claude Code playbook (paste-ready prompts)
-- *"The Kendo Scheduler in src/components/SchedulerBoard.tsx throws [ERROR]. Fix the
-  resource grouping / onDataChange mapping against the current @progress/kendo-react-scheduler
-  API. Do not change the props it receives or the onMove(sessionId, roomId, slot) contract."*
-- *"Dragging across room lanes doesn't change roomId in the updated item. Find the correct
-  way to enable cross-resource drag in KendoReact Scheduler DayView with vertical grouping."*
-- *"Add a read-only 'Attendee view' tab: pick an attendee from a Kendo DropDownList, show
-  their 3 preferred sessions and flag any that overlap."* (stretch goal ONLY if ahead)
+## The demo arc
 
-## Architecture (30-second version)
-Vite + React + TS. No backend, no router, no auth — state is one `useState(assignments)`;
-`computeStats` is a pure function re-run via `useMemo` on every drag (1,200 × 3 prefs ≈
-instant). Kendo: Scheduler (board), Grid (sessions), Charts (room load), TabStrip,
-Notification (move feedback). The "Imported from Eventbrite" badge is the faked integration.
+| Step | Action | Impacted | Seats short | Overflows |
+|------|--------|----------|-------------|-----------|
+| Start | Broken import | **729** | 366 | 3 |
+| Drag 1 | Fine-Tuning → Main Hall @ 10:00 | 574 | 293 | 2 |
+| Drag 2 | LLMs in Production → Main Hall @ 9:00 | 496 | 114 | 1 |
+| Drag 3 | React Server Components → Main Hall @ 13:00 | **186** | **0** | **0** |
 
-## Honest claims for the writeup
-- Preference data is synthetic but **generated, clustered, and deterministic** — framed as
-  a registration import, which is exactly the real integration path (Eventbrite/Sessionize APIs).
-- The engine is exact counting, not ML. That's a feature: explainable, instant, trustworthy.
-- Roadmap slide: auto-suggest fixes (greedy swap search — engine already supports scoring
-  any candidate move), live re-scheduling on event day, CFP-vote import.
+Three drags. 543 fewer impacted attendees. Zero overflows.
+
+---
+
+## How it works
+
+**The broken-pipe insight:** registration systems capture rich preference data (which
+sessions attendees want), but scheduling tools ignore it entirely. Slotwise closes that
+loop:
+
+1. **Import** attendee preferences at startup (1,200 attendees × 3 picks each, from a
+   deterministic synthetic dataset that mimics a real Eventbrite/Sessionize export).
+2. **Score** the agenda: for each attendee, count how many preferred sessions clash
+   (same time slot). Count overflow: expected turnout vs room capacity.
+3. **Re-score on every drag** — `computeStats` is a pure function (`useMemo` dep on
+   `assignments`). On n = 1,200 attendees with 3 prefs each, one pass through is ≈ 3ms.
+   The hero counter animates while you drag.
+
+The engine is exact counting (Maps, O(1) lookups), not ML. That's a feature: explainable,
+instant, deterministic, trustworthy.
+
+---
+
+## Kendo UI components used
+
+- **Scheduler** — drag-and-drop agenda board with vertical room grouping
+- **Grid** — session table with custom status, demand, and clash-partner cells
+- **Chart** — utilisation bar chart with interactive tooltips and overflow bands
+- **TabStrip** — three-tab layout (Agenda board / Room load / Sessions)
+- **Notification** — per-drag toast with before/after diff
+
+---
+
+## What's real vs. simulated
+
+| Thing | Reality |
+|---|---|
+| Preference data | Synthetic, seeded deterministically (seed 20260718). Clustered to simulate real attendee behaviour. Framed as a registration import — which is exactly the real integration path. |
+| Scoring engine | Exact counting, no approximation |
+| Drag-and-drop | Live KendoReact Scheduler; falls back to custom HTML5 DnD if needed |
+| Backend | None — client-only SPA by design |
+
+---
+
+## Tech stack
+
+- React 18 + TypeScript, Vite
+- KendoReact 15.0.0 (same major across all `@progress/kendo-react-*` packages)
+- `@progress/kendo-data-query` for Grid sort/filter
+- Vitest 2.1.9 — 23 unit tests lock the demo math in CI
+
+---
+
+## Roadmap
+
+- **Auto-suggest fixes** — the engine already scores any candidate move; a greedy swap
+  search over unscheduled slots could surface "drag session X here to save 120 people"
+- **Live re-scheduling** — re-run after room capacity changes are confirmed on event day
+- **Real import** — Eventbrite/Sessionize API integration (same data shape as synthetic set)
+
+---
+
+## Security notes
+
+`npm audit` reports 4 moderate + 1 critical vulnerability in the `esbuild ≤ 0.24.2`
+chain (CVE GHSA-67mh-4wv8-2f99). The fix requires Vite 8 which is a breaking change.
+These only affect the **dev server** (an attacker on localhost could probe it) — the
+production `npm run build` output is static assets with no server. Safe for a demo environment.
+
+No secrets are committed. The Kendo license is activated via `npx kendo-ui-license activate`
+which patches `node_modules` in-place; the license file is in `.gitignore`.

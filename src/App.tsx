@@ -30,6 +30,11 @@ export default function App() {
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4200);
   }, []);
 
+  const handleReset = useCallback(() => {
+    setAssignments(INITIAL_ASSIGNMENTS);
+    pushToast("warning", "Agenda reset to imported state — ready to demo again");
+  }, [pushToast]);
+
   const handleMove = useCallback(
     (sessionId: string, roomId: string, slot: number) => {
       setAssignments((prev) => {
@@ -54,7 +59,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <ScoreHeader stats={stats} attendeeCount={attendees.length} eventName={EVENT.name} />
+      <ScoreHeader stats={stats} attendeeCount={attendees.length} eventName={EVENT.name} onReset={handleReset} />
       <main className="content">
         <TabStrip selected={tab} onSelect={(e) => setTab(e.selected)} className="tabs">
           <TabStripTab title="Agenda board">

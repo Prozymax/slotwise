@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-/** Tween a number toward its target — the signature "score collapsing" moment. */
 function useAnimatedNumber(target: number, ms = 650) {
   const [value, setValue] = useState(target);
   const fromRef = useRef(target);
@@ -22,8 +21,7 @@ function useAnimatedNumber(target: number, ms = 650) {
   return value;
 }
 
-export default function ScoreHeader({ stats, attendeeCount, eventName }) {
-  // Hero metric: attendees impacted = people with a clash + people who won't get a seat.
+export default function ScoreHeader({ stats, attendeeCount, eventName, onReset }) {
   const impacted = stats.affected + stats.seatsShort;
   const shown = useAnimatedNumber(impacted);
   const severity = impacted > 500 ? "bad" : impacted > 250 ? "warn" : "good";
@@ -31,12 +29,16 @@ export default function ScoreHeader({ stats, attendeeCount, eventName }) {
   return (
     <header className="score-header">
       <div className="brand">
-        <span className="brand-mark">◫</span>
-        <div>
+        <div className="brand-mark">◫</div>
+        <div className="brand-text">
           <div className="brand-name">Slotwise</div>
           <div className="brand-sub">
-            {eventName} · <span className="import-badge">✓ Imported from Eventbrite — {attendeeCount.toLocaleString()} registrations</span>
+            {eventName} ·{" "}
+            <span className="import-badge">
+              ✓ {attendeeCount.toLocaleString()} registrations imported
+            </span>
           </div>
+          <button className="reset-btn" onClick={onReset}>↺ Reset agenda</button>
         </div>
       </div>
 
@@ -48,11 +50,11 @@ export default function ScoreHeader({ stats, attendeeCount, eventName }) {
       <div className="stat-tiles">
         <div className={`tile ${stats.affected > 250 ? "tile-bad" : "tile-good"}`}>
           <div className="tile-value">{stats.affected.toLocaleString()}</div>
-          <div className="tile-label">people with a schedule clash</div>
+          <div className="tile-label">schedule clashes</div>
         </div>
         <div className={`tile ${stats.seatsShort > 0 ? "tile-bad" : "tile-good"}`}>
           <div className="tile-value">{stats.seatsShort.toLocaleString()}</div>
-          <div className="tile-label">seats short across rooms</div>
+          <div className="tile-label">seats short</div>
         </div>
         <div className={`tile ${stats.overflows.length > 0 ? "tile-bad" : "tile-good"}`}>
           <div className="tile-value">{stats.overflows.length}</div>
@@ -60,13 +62,14 @@ export default function ScoreHeader({ stats, attendeeCount, eventName }) {
         </div>
         <div className={`tile ${stats.speakerConflicts.length > 0 ? "tile-bad" : "tile-good"}`}>
           <div className="tile-value">{stats.speakerConflicts.length}</div>
-          <div className="tile-label">speaker double-bookings</div>
+          <div className="tile-label">speaker conflicts</div>
         </div>
       </div>
 
       {stats.worstPair && stats.worstPair.count > 40 && (
         <div className="worst-clash">
-          ⚡ Worst clash: <b>{stats.worstPair.titles[0]}</b> vs <b>{stats.worstPair.titles[1]}</b> — {stats.worstPair.count} attendees want both
+          ⚡ Worst clash: <b>{stats.worstPair.titles[0]}</b> vs{" "}
+          <b>{stats.worstPair.titles[1]}</b> — {stats.worstPair.count} attendees want both
         </div>
       )}
     </header>

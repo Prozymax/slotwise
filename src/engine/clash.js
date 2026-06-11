@@ -96,9 +96,13 @@ export function computeStats(assignments, data) {
   }
 
   // 5) Per-cell utilization for the chart: rows = rooms, cols = slots.
+  const cellToSession = new Map();
+  for (const [id, asg] of Object.entries(assignments)) {
+    if (asg) cellToSession.set(`${asg.roomId}:${asg.slot}`, id);
+  }
   const utilization = rooms.map((r) =>
     slots.map((_, slotIdx) => {
-      const sid = Object.keys(assignments).find((id) => assignments[id].roomId === r.id && assignments[id].slot === slotIdx);
+      const sid = cellToSession.get(`${r.id}:${slotIdx}`);
       if (!sid) return { sessionId: null, expected: 0, capacity: r.capacity, pct: 0 };
       const expected = Math.round((demand.get(sid) || 0) * ATTENDANCE_RATE);
       return { sessionId: sid, expected, capacity: r.capacity, pct: Math.round((expected / r.capacity) * 100) };
@@ -109,7 +113,7 @@ export function computeStats(assignments, data) {
   const affected = clashedAttendees;
   const composite = totalMissedSessions * 2 + seatsShort + speakerConflicts.length * 500;
 
-  return { affected, clashedAttendees, totalMissedSessions, overflows, seatsShort, speakerConflicts, worstPair, utilization, composite, demand };
+  return { affected, clashedAttendees, totalMissedSessions, overflows, seatsShort, speakerConflicts, worstPair, utilization, composite, demand, clashPairs };
 }
 
 /**
@@ -119,7 +123,13 @@ export function computeStats(assignments, data) {
 export function applyMove(assignments, sessionId, roomId, slot) {
   const next = { ...assignments };
   const from = next[sessionId];
-  const occupantId = Object.keys(next).find((id) => id !== sessionId && next[id].roomId === roomId && next[id].slot === slot);
+  let occupantId;
+  for (const id of Object.keys(next)) {
+    if (id !== sessionId && next[id]?.roomId === roomId && next[id]?.slot === slot) {
+      occupantId = id;
+      break;
+    }
+  }
   next[sessionId] = { roomId, slot };
   if (occupantId) next[occupantId] = from ? { ...from } : undefined;
   return next;
