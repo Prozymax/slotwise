@@ -9,6 +9,7 @@ import SchedulerBoard from "./components/SchedulerBoard";
 // import SchedulerBoard from "./components/BoardFallback";
 import DemandChart from "./components/DemandChart";
 import SessionsGrid from "./components/SessionsGrid";
+import JourneyView from "./components/JourneyView";
 import "./styles.css";
 
 const attendees = generateAttendees();
@@ -70,6 +71,9 @@ export default function App() {
           </TabStripTab>
           <TabStripTab title="Sessions">
             <SessionsGrid assignments={assignments} stats={stats} data={DATA} />
+          </TabStripTab>
+          <TabStripTab title="Journey">
+            <JourneyView assignments={assignments} data={DATA} />
           </TabStripTab>
         </TabStrip>
       </main>

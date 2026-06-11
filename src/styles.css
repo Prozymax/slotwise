@@ -696,3 +696,252 @@ body {
   .hero-number { animation: none !important; transition: none; }
   .fb-card     { transition: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Journey Mode
+══════════════════════════════════════════════════════════════ */
+.journey-wrap {
+  padding: 20px 24px 32px;
+  max-width: 860px;
+}
+
+/* Picker row */
+.journey-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.journey-picker-label {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.journey-picker-suffix {
+  font-size: 13px;
+  color: #6B6880;
+}
+
+/* Persona card */
+.journey-persona {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--border, #E4E2ED);
+  background: var(--card);
+  margin-bottom: 24px;
+  transition: border-color .2s;
+}
+.journey-persona.persona-issues {
+  border-color: var(--amber);
+  background: linear-gradient(135deg, #FFFBF0 0%, #FFF 60%);
+}
+.journey-persona.persona-clear {
+  border-color: var(--emerald);
+  background: linear-gradient(135deg, #F0FFF8 0%, #FFF 60%);
+}
+.journey-avatar {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.journey-info { flex: 1; min-width: 0; }
+.journey-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.journey-role {
+  font-size: 13px;
+  color: #6B6880;
+  margin-bottom: 6px;
+}
+.journey-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.journey-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--violet-soft);
+  color: var(--violet);
+  letter-spacing: .02em;
+}
+
+/* Badge */
+.journey-badge {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.jbadge-error { background: var(--coral-soft); color: var(--coral); }
+.jbadge-warn  { background: var(--amber-soft); color: #B45309; }
+.jbadge-ok    { background: var(--emerald-soft); color: #065F46; }
+
+/* Section */
+.journey-section { margin-bottom: 24px; }
+.journey-section-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #8C88A0;
+  margin: 0 0 12px;
+}
+
+/* Timeline */
+.journey-timeline { display: flex; flex-direction: column; gap: 0; }
+.journey-empty { color: #9B96B0; font-style: italic; font-size: 13px; }
+
+.journey-stop {
+  display: grid;
+  grid-template-columns: 54px 28px 1fr auto;
+  align-items: start;
+  gap: 0 8px;
+  padding: 4px 0;
+  position: relative;
+}
+
+/* Time label */
+.stop-time {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6B6880;
+  padding-top: 4px;
+  text-align: right;
+}
+
+/* Connector column */
+.stop-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 6px;
+}
+.stop-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2.5px solid #CBD5E1;
+  background: #fff;
+  flex-shrink: 0;
+  transition: border-color .2s, background .2s;
+}
+.stop-line {
+  width: 2px;
+  flex: 1;
+  min-height: 36px;
+  background: #E2DEED;
+  margin-top: 2px;
+}
+.journey-stop.stop-conflict .stop-dot { border-color: var(--amber); background: var(--amber-soft); }
+.journey-stop.stop-overflow .stop-dot { border-color: var(--coral); background: var(--coral-soft); }
+.journey-stop.stop-ok       .stop-dot { border-color: var(--emerald); background: var(--emerald-soft); }
+
+/* Body */
+.stop-body {
+  padding: 2px 0 16px;
+}
+.stop-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+.stop-meta {
+  font-size: 12px;
+  color: #6B6880;
+  margin-bottom: 4px;
+}
+.stop-room { font-weight: 500; color: #4B4768; }
+.stop-capacity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 11px;
+  color: #9B96B0;
+}
+.cap-sep { color: #C8C4D8; }
+.cap-exp-over, .cap-seats-over { color: var(--coral); font-weight: 600; }
+
+/* Status chip */
+.stop-status { padding-top: 3px; flex-shrink: 0; }
+.sstatus {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.sstatus-ok       { background: var(--emerald-soft); color: #065F46; }
+.sstatus-conflict { background: var(--amber-soft);   color: #92400E; }
+.sstatus-overflow { background: var(--coral-soft);   color: var(--coral); }
+
+/* Gap marker */
+.journey-gap-marker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 8px 62px;
+  color: #9B96B0;
+  font-size: 11px;
+}
+.gap-line { flex: 1; height: 1px; background: #E2DEED; }
+.gap-text { white-space: nowrap; }
+
+/* Issues */
+.journey-issues { display: flex; flex-direction: column; gap: 8px; }
+.jissue {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  border-left: 3px solid transparent;
+}
+.jissue-error {
+  background: var(--coral-soft);
+  border-color: var(--coral);
+}
+.jissue-warn {
+  background: var(--amber-soft);
+  border-color: var(--amber);
+}
+.jissue-info {
+  background: var(--violet-soft);
+  border-color: var(--violet);
+}
+.jissue-icon { font-size: 16px; flex-shrink: 0; padding-top: 1px; }
+.jissue-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 2px;
+}
+.jissue-error .jissue-label { color: var(--coral); }
+.jissue-warn  .jissue-label { color: #92400E; }
+.jissue-info  .jissue-label { color: var(--violet); }
+.jissue-msg { font-size: 13px; color: var(--ink); line-height: 1.4; }
+
+/* All-clear */
+.journey-all-clear {
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  background: var(--emerald-soft);
+  border-left: 3px solid var(--emerald);
+  font-size: 13px;
+  color: #065F46;
+  font-weight: 500;
+}
