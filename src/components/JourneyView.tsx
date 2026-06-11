@@ -1,87 +1,59 @@
 import { useMemo, useState } from "react";
-import { DropDownList } from "@progress/kendo-react-dropdowns";
 import { computeJourney } from "../engine/journey.js";
 import { PERSONAS } from "../data/personas.js";
 
-type Persona = (typeof PERSONAS)[0];
+type Persona  = (typeof PERSONAS)[0];
+type Filter   = "all" | "issues" | "clear";
+type Journey  = ReturnType<typeof computeJourney>;
 
 const ISSUE_ICONS: Record<string, string> = {
-  conflict: "⚡",
-  overflow: "⛔",
-  fatigue:  "🔋",
-  gap:      "💬",
+  conflict: "⚡", overflow: "⛔", fatigue: "🔋", gap: "💬",
 };
 
-export default function JourneyView({ assignments, data }) {
-  const [persona, setPersona] = useState<Persona>(PERSONAS[0]);
-
-  const journey = useMemo(
-    () => computeJourney(persona, assignments, data.sessions, data.slots, data.demand, data.rooms),
-    [persona, assignments, data]
-  );
-
+// ── Right panel: full journey detail ──────────────────────────
+function JourneyDetail({ persona, journey }: { persona: Persona; journey: Journey }) {
   const errorCount = journey.issues.filter(i => i.severity === "error").length;
   const warnCount  = journey.issues.filter(i => i.severity === "warn").length;
   const hasProblems = errorCount + warnCount > 0;
 
   return (
-    <div className="journey-wrap">
-
-      {/* ── Persona picker ── */}
-      <div className="journey-picker-row">
-        <span className="journey-picker-label">Show me</span>
-        <DropDownList
-          data={PERSONAS}
-          textField="name"
-          dataItemKey="id"
-          value={persona}
-          onChange={(e) => setPersona(e.value as Persona)}
-          style={{ width: 240 }}
-        />
-        <span className="journey-picker-suffix">— as the agenda stands today</span>
-      </div>
-
-      {/* ── Persona card ── */}
-      <div className={`journey-persona ${hasProblems ? "persona-issues" : "persona-clear"}`}>
-        <div className="journey-avatar">{persona.avatar}</div>
-        <div className="journey-info">
-          <div className="journey-name">{persona.name}</div>
-          <div className="journey-role">{persona.role}</div>
+    <div className="jdetail-wrap">
+      {/* Persona header */}
+      <div className={`jdetail-header ${hasProblems ? "jheader-issues" : "jheader-clear"}`}>
+        <div className="jdetail-avatar">{persona.avatar}</div>
+        <div className="jdetail-info">
+          <div className="jdetail-name">{persona.name}</div>
+          <div className="jdetail-role">{persona.role}</div>
           <div className="journey-tags">
-            {persona.interests.map(t => (
-              <span key={t} className="journey-tag">{t}</span>
-            ))}
+            {persona.interests.map(t => <span key={t} className="journey-tag">{t}</span>)}
           </div>
         </div>
-        <div className={`journey-badge ${errorCount > 0 ? "jbadge-error" : warnCount > 0 ? "jbadge-warn" : "jbadge-ok"}`}>
+        <div className={`journey-badge ${
+          errorCount > 0 ? "jbadge-error" : warnCount > 0 ? "jbadge-warn" : "jbadge-ok"
+        }`}>
           {errorCount > 0
             ? `${errorCount} conflict${errorCount > 1 ? "s" : ""}`
-            : warnCount > 0
-            ? `${warnCount} warning`
-            : "✓ All clear"}
+            : warnCount > 0 ? `${warnCount} warning` : "✓ All clear"}
         </div>
       </div>
 
-      {/* ── Day timeline ── */}
+      {/* Timeline */}
       <div className="journey-section">
         <h3 className="journey-section-title">
           {persona.name.split(" ")[0]}'s Conference Day
         </h3>
-
         <div className="journey-timeline">
           {journey.picks.length === 0 && (
-            <p className="journey-empty">None of {persona.name.split(" ")[0]}'s preferred sessions are scheduled yet.</p>
+            <p className="journey-empty">
+              None of {persona.name.split(" ")[0]}'s sessions are scheduled yet.
+            </p>
           )}
-
           {journey.picks.map((pick, i) => {
             const prev = i > 0 ? journey.picks[i - 1] : null;
-            const gapBefore = prev != null && pick.slot != null && prev.slot != null
-              ? pick.slot - prev.slot - 1
-              : 0;
-
+            const gapBefore = prev?.slot != null && pick.slot != null
+              ? pick.slot - prev.slot - 1 : 0;
             return (
               <div key={pick.sessionId}>
-                {/* Networking gap marker */}
                 {gapBefore >= 2 && (
                   <div className="journey-gap-marker">
                     <span className="gap-line" />
@@ -91,16 +63,14 @@ export default function JourneyView({ assignments, data }) {
                     <span className="gap-line" />
                   </div>
                 )}
-
-                {/* Session stop */}
-                <div className={`journey-stop ${pick.hasConflict ? "stop-conflict" : pick.isOverflow ? "stop-overflow" : "stop-ok"}`}>
+                <div className={`journey-stop ${
+                  pick.hasConflict ? "stop-conflict" : pick.isOverflow ? "stop-overflow" : "stop-ok"
+                }`}>
                   <div className="stop-time">{pick.slotLabel}</div>
-
                   <div className="stop-connector">
                     <div className="stop-dot" />
                     {i < journey.picks.length - 1 && <div className="stop-line" />}
                   </div>
-
                   <div className="stop-body">
                     <div className="stop-title">{pick.session.title}</div>
                     <div className="stop-meta">
@@ -124,7 +94,6 @@ export default function JourneyView({ assignments, data }) {
                       )}
                     </div>
                   </div>
-
                   <div className="stop-status">
                     {pick.hasConflict
                       ? <span className="sstatus sstatus-conflict">⚡ Conflict</span>
@@ -139,7 +108,7 @@ export default function JourneyView({ assignments, data }) {
         </div>
       </div>
 
-      {/* ── Issues ── */}
+      {/* Issues */}
       {journey.issues.length > 0 && (
         <div className="journey-section">
           <h3 className="journey-section-title">Issues detected</h3>
@@ -157,17 +126,129 @@ export default function JourneyView({ assignments, data }) {
         </div>
       )}
 
-      {/* ── All-clear state ── */}
       {journey.issues.length === 0 && journey.picks.length > 0 && (
         <div className="journey-all-clear">
-          ✓ {persona.name.split(" ")[0]}'s day is conflict-free, every room fits the expected crowd,
-          and the schedule has breathing room.
+          ✓ {persona.name.split(" ")[0]}'s day is conflict-free, every room fits the
+          expected crowd, and the schedule has breathing room.
         </div>
       )}
 
       <p className="board-hint" style={{ marginTop: 16 }}>
-        Fix sessions on the Agenda board — this view updates instantly to show the impact on real attendees.
+        Fix sessions on the Agenda board — this view updates instantly.
       </p>
+    </div>
+  );
+}
+
+// ── Main layout ────────────────────────────────────────────────
+export default function JourneyView({ assignments, data }) {
+  const [selected, setSelected] = useState<Persona>(PERSONAS[0]);
+  const [filter, setFilter]     = useState<Filter>("all");
+
+  // Compute all journeys at once (5 pure fn calls — negligible)
+  const allJourneys = useMemo(
+    () => PERSONAS.map(p => ({
+      persona: p,
+      journey: computeJourney(p, assignments, data.sessions, data.slots, data.demand, data.rooms),
+    })),
+    [assignments, data]
+  );
+
+  const issueCount = allJourneys.filter(
+    j => j.journey.issues.some(i => i.severity === "error")
+  ).length;
+  const clearCount = allJourneys.length - issueCount;
+
+  const filtered = allJourneys.filter(({ journey }) => {
+    const hasErrors = journey.issues.some(i => i.severity === "error");
+    if (filter === "issues") return hasErrors;
+    if (filter === "clear")  return !hasErrors;
+    return true;
+  });
+
+  const selectedEntry = allJourneys.find(j => j.persona.id === selected.id);
+
+  return (
+    <div className="journey-layout">
+
+      {/* ── Left sidebar ── */}
+      <div className="journey-sidebar">
+
+        {/* Conflict filter */}
+        <div className="journey-filter">
+          <span className="jfilter-label">Filter</span>
+          <div className="jfilter-pills">
+            {([
+              ["all",    `All (${allJourneys.length})`],
+              ["issues", `Conflicts (${issueCount})`],
+              ["clear",  `Clear (${clearCount})`],
+            ] as [Filter, string][]).map(([key, label]) => (
+              <button
+                key={key}
+                className={`jfilter-btn ${filter === key ? "jfilter-active" : ""}`}
+                onClick={() => setFilter(key)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Persona list */}
+        <div className="journey-persona-list">
+          {filtered.length === 0 && (
+            <p className="jlist-empty">No delegates match this filter.</p>
+          )}
+          {filtered.map(({ persona, journey }) => {
+            const errors = journey.issues.filter(i => i.severity === "error").length;
+            const warns  = journey.issues.filter(i => i.severity === "warn").length;
+            const infos  = journey.issues.filter(i => i.severity === "info").length;
+            const isActive = selected.id === persona.id;
+            return (
+              <button
+                key={persona.id}
+                className={`jlist-item ${isActive ? "jlist-active" : ""}`}
+                onClick={() => setSelected(persona)}
+              >
+                <div className="jlist-avatar">{persona.avatar}</div>
+                <div className="jlist-info">
+                  <div className="jlist-name">{persona.name}</div>
+                  <div className="jlist-role">{persona.role}</div>
+                  <div className="jlist-badges">
+                    {errors > 0 && (
+                      <span className="jlist-badge jlbadge-error">
+                        ⚡ {errors} conflict{errors > 1 ? "s" : ""}
+                      </span>
+                    )}
+                    {warns > 0 && (
+                      <span className="jlist-badge jlbadge-warn">
+                        🔋 fatigue
+                      </span>
+                    )}
+                    {errors === 0 && warns === 0 && infos > 0 && (
+                      <span className="jlist-badge jlbadge-info">
+                        💬 {infos} window{infos > 1 ? "s" : ""}
+                      </span>
+                    )}
+                    {errors === 0 && warns === 0 && (
+                      <span className="jlist-badge jlbadge-ok">✓ Clear</span>
+                    )}
+                  </div>
+                </div>
+                {isActive && <div className="jlist-arrow">›</div>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Right detail panel ── */}
+      <div className="journey-detail">
+        {selectedEntry
+          ? <JourneyDetail persona={selectedEntry.persona} journey={selectedEntry.journey} />
+          : <p className="journey-empty" style={{ padding: 24 }}>Select a delegate on the left.</p>
+        }
+      </div>
     </div>
   );
 }
