@@ -1,0 +1,43 @@
+{
+  "name": "slotwise",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b --noCheck && vite build",
+    "preview": "vite preview",
+    "verify-demo": "node scripts/verify_demo.mjs"
+  },
+  "dependencies": {
+    "@progress/kendo-data-query": "latest",
+    "@progress/kendo-drawing": "latest",
+    "@progress/kendo-licensing": "latest",
+    "@progress/kendo-react-animation": "latest",
+    "@progress/kendo-react-buttons": "latest",
+    "@progress/kendo-react-charts": "latest",
+    "@progress/kendo-react-dateinputs": "latest",
+    "@progress/kendo-react-dialogs": "latest",
+    "@progress/kendo-react-dropdowns": "latest",
+    "@progress/kendo-react-form": "latest",
+    "@progress/kendo-react-grid": "latest",
+    "@progress/kendo-react-inputs": "latest",
+    "@progress/kendo-react-intl": "latest",
+    "@progress/kendo-react-layout": "latest",
+    "@progress/kendo-react-notification": "latest",
+    "@progress/kendo-react-popup": "latest",
+    "@progress/kendo-react-scheduler": "latest",
+    "@progress/kendo-svg-icons": "latest",
+    "@progress/kendo-theme-default": "latest",
+    "hammerjs": "^2.0.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.0"
+  }
+}

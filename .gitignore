@@ -1,0 +1,12 @@
+node_modules/
+dist/
+
+# Kendo / Telerik license key files — never commit these
+telerik-license.txt
+kendo-ui-license.txt
+.env
+.env.*
+
+# Editor & OS
+.DS_Store
+*.local

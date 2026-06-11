@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/kendo-license-stub.ts","./src/main.tsx","./src/components/boardfallback.tsx","./src/components/demandchart.tsx","./src/components/schedulerboard.tsx","./src/components/scoreheader.tsx","./src/components/sessionsgrid.tsx","./src/data/seed.js","./src/engine/clash.js"],"checkPending":true,"version":"5.9.3"}

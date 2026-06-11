@@ -1,0 +1,101 @@
+/* ── Slotwise design tokens ─────────────────────────────────
+   ink      #15131F  control-room header
+   surface  #F6F5F2  app background
+   coral    #E5484D  clash / over capacity
+   amber    #F5A524  warning
+   green    #30A46C  resolved
+   violet   #7C5CFF  accent (Main Hall)
+   Display: Sora · Body: Inter · Counter: tabular numerals
+──────────────────────────────────────────────────────────── */
+@import "@progress/kendo-theme-default/dist/all.css";
+
+* { box-sizing: border-box; }
+body { margin: 0; background: #f6f5f2; font-family: "Inter", system-ui, sans-serif; color: #15131f; }
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── Header: the control room ── */
+.score-header {
+  background: linear-gradient(160deg, #15131f 0%, #1d1930 100%);
+  color: #f6f5f2;
+  padding: 20px 28px 16px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px 32px;
+  align-items: center;
+}
+.brand { display: flex; gap: 12px; align-items: center; }
+.brand-mark { font-size: 26px; color: #7c5cff; }
+.brand-name { font-family: "Sora", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+.brand-sub { font-size: 12px; color: #9b96b0; margin-top: 2px; }
+.import-badge { color: #30a46c; font-weight: 600; }
+
+.hero-score { text-align: center; }
+.hero-number {
+  font-family: "Sora", sans-serif;
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  transition: color 400ms ease;
+}
+.hero-bad .hero-number { color: #ff6369; text-shadow: 0 0 32px rgba(229, 72, 77, 0.35); }
+.hero-warn .hero-number { color: #f5a524; text-shadow: 0 0 32px rgba(245, 165, 36, 0.3); }
+.hero-good .hero-number { color: #3dd68c; text-shadow: 0 0 32px rgba(48, 164, 108, 0.35); }
+.hero-label { font-size: 12px; color: #9b96b0; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+.stat-tiles { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.tile { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 8px 14px; min-width: 118px; }
+.tile-value { font-family: "Sora", sans-serif; font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.tile-bad .tile-value { color: #ff6369; }
+.tile-good .tile-value { color: #3dd68c; }
+.tile-label { font-size: 10.5px; color: #9b96b0; margin-top: 2px; }
+
+.worst-clash { grid-column: 1 / -1; font-size: 13px; color: #c9c4dd; background: rgba(229, 72, 77, 0.12); border: 1px solid rgba(229, 72, 77, 0.3); border-radius: 8px; padding: 7px 12px; }
+.worst-clash b { color: #ff9398; }
+
+/* ── Content ── */
+.content { flex: 1; padding: 18px 28px 28px; }
+.tabs .k-tabstrip-items-wrapper { margin-bottom: 12px; }
+.board-wrap, .grid-wrap, .chart-wrap { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 1px 3px rgba(21, 19, 31, 0.08); }
+.board-hint { font-size: 12.5px; color: #6d6884; margin: 10px 4px 0; }
+.chart-callout { margin-top: 12px; border-radius: 8px; padding: 10px 14px; font-size: 13.5px; font-weight: 500; }
+.chart-callout-bad { background: rgba(229, 72, 77, 0.09); color: #b3232f; border: 1px solid rgba(229, 72, 77, 0.25); }
+.chart-callout-good { background: rgba(48, 164, 108, 0.1); color: #1c7a4d; border: 1px solid rgba(48, 164, 108, 0.25); }
+
+/* ── Fallback board ── */
+.fb-grid { display: grid; gap: 6px; }
+.fb-corner { }
+.fb-slot-head { font-family: "Sora", sans-serif; font-weight: 600; font-size: 13px; text-align: center; color: #6d6884; padding: 6px 0; }
+.fb-room-head { padding: 8px 10px; align-self: stretch; display: flex; flex-direction: column; justify-content: center; border-right: 2px solid #e8e6e0; }
+.fb-room-name { font-family: "Sora", sans-serif; font-weight: 700; font-size: 14px; }
+.fb-room-cap { font-size: 11.5px; color: #6d6884; }
+.fb-cell { background: #f1efe9; border-radius: 8px; min-height: 96px; padding: 4px; transition: background 120ms; }
+.fb-cell-hover { background: #e3defc; outline: 2px dashed #7c5cff; }
+.fb-empty { color: #b6b1c6; font-size: 11px; text-align: center; padding-top: 38px; }
+.fb-card { background: #fff; border-radius: 7px; padding: 7px 8px; height: 100%; cursor: grab; border-left: 4px solid #c4c0d4; box-shadow: 0 1px 2px rgba(21,19,31,.1); position: relative; }
+.fb-card:active { cursor: grabbing; }
+.fb-dragging { opacity: 0.4; }
+.fb-card-title { font-size: 11.5px; font-weight: 600; line-height: 1.25; }
+.fb-card-meta { font-size: 10.5px; color: #6d6884; margin-top: 2px; }
+.fb-card-foot { display: flex; justify-content: space-between; margin-top: 5px; font-size: 10px; }
+.fb-track { color: #6d6884; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.fb-load { font-variant-numeric: tabular-nums; color: #1c7a4d; font-weight: 600; }
+.fb-load-over { color: #b3232f; }
+.fb-flag { font-size: 9.5px; font-weight: 700; color: #b3232f; margin-top: 3px; }
+.fb-flag-clash { color: #b07b0e; }
+.track-ai { border-left-color: #7c5cff; }
+.track-web { border-left-color: #2aa7a0; }
+.track-data { border-left-color: #e8743b; }
+.track-career { border-left-color: #d6409f; }
+.fb-overflow { background: #fdeaea; }
+.fb-clash { outline: 2px solid #f5a524; }
+
+@media (max-width: 1100px) {
+  .score-header { grid-template-columns: 1fr; text-align: center; }
+  .stat-tiles { justify-content: center; }
+  .brand { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-number { transition: none; }
+}
