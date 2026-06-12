@@ -1985,3 +1985,277 @@ body {
   color: #059669;
   font-weight: 600;
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE STYLES
+══════════════════════════════════════════════════════════════ */
+
+/* Tablets and below (< 768px) */
+@media (max-width: 768px) {
+  /* Header adjustments */
+  .score-header {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .header-left {
+    align-items: center;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand-name {
+    font-size: 18px;
+  }
+
+  .reset-btn {
+    align-self: center;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hero score */
+  .hero-number {
+    font-size: 48px;
+  }
+
+  .hero-score {
+    padding: 16px 24px;
+  }
+
+  /* Attendee badge */
+  .attendee-badge {
+    justify-content: center;
+  }
+
+  /* Stats grid - 2 columns on mobile */
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-item {
+    min-width: auto;
+  }
+
+  /* Content padding */
+  .content {
+    padding: 16px;
+  }
+
+  /* Board layout - switch to vertical */
+  .board-layout-horizontal {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .board-sidebar {
+    width: 100%;
+  }
+
+  /* Room capacity panel - horizontal scroll on mobile */
+  .board-sidebar .rcp-strip {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .rcp-room {
+    min-width: 200px;
+    flex-shrink: 0;
+  }
+
+  /* Demand/Load stats - 2 columns */
+  .dl-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Overflow cards - stack vertically */
+  .overflow-cards-row {
+    flex-direction: column;
+  }
+
+  .ov-card {
+    max-width: 100%;
+  }
+
+  /* Journey layout - stack vertically */
+  .journey-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .journey-sidebar {
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .jlist {
+    max-height: 300px;
+  }
+
+  /* Fallback board - allow horizontal scroll */
+  .fb-board {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .fb-cal {
+    min-width: 600px;
+  }
+
+  /* Tab content */
+  .tabs .k-item .k-link {
+    font-size: 12px;
+    padding: 8px 12px !important;
+  }
+}
+
+/* Small mobile devices (< 480px) */
+@media (max-width: 480px) {
+  /* Header */
+  .score-header {
+    padding: 12px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+  }
+
+  .brand-sub {
+    font-size: 11px;
+  }
+
+  .hero-number {
+    font-size: 36px;
+  }
+
+  .hero-score {
+    padding: 12px 20px;
+  }
+
+  /* Stats - single column on very small screens */
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dl-stats {
+    grid-template-columns: 1fr;
+  }
+
+  /* Attendee badge */
+  .attendee-count {
+    font-size: 20px;
+  }
+
+  .attendee-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Content */
+  .content {
+    padding: 12px;
+  }
+
+  .board-wrap,
+  .grid-wrap,
+  .chart-wrap {
+    padding: 12px;
+  }
+
+  /* Room capacity cards */
+  .rcp-room {
+    min-width: 180px;
+  }
+
+  /* Fallback board */
+  .fb-cal {
+    min-width: 500px;
+  }
+
+  .fb-card {
+    min-height: 80px;
+  }
+
+  .fb-card-title {
+    font-size: 11px;
+  }
+
+  .fb-card-meta {
+    font-size: 9.5px;
+  }
+
+  /* Tabs */
+  .tabs .k-item .k-link {
+    font-size: 11px;
+    padding: 6px 10px !important;
+  }
+
+  /* Grid text sizes */
+  .grid-wrap .k-grid td {
+    font-size: 11px !important;
+  }
+
+  .grid-wrap .k-grid-header th {
+    font-size: 10px !important;
+  }
+}
+
+/* Landscape phone optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .journey-layout {
+    grid-template-columns: 240px 1fr;
+    height: calc(100vh - 180px);
+  }
+
+  .journey-sidebar {
+    height: 100%;
+  }
+
+  .jlist {
+    max-height: none;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets */
+  .reset-btn {
+    min-height: 44px;
+  }
+
+  .tabs .k-item .k-link {
+    padding: 12px 16px !important;
+  }
+
+  .rcp-pip {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Disable hover effects on touch */
+  .fb-card:hover {
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .stat-item:hover {
+    transform: none;
+  }
+
+  .dl-stat:hover {
+    transform: none;
+  }
+}
