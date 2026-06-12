@@ -237,7 +237,7 @@ export default function DemandChart({ stats, data }) {
                   <div className="ov-over">+{ov.over} seats short</div>
                   {wouldFit && (
                     <div className="ov-hint">
-                      💡 Main Hall ({mainHall.capacity} seats) would fit this session
+                      Main Hall ({mainHall.capacity} seats) would fit this session
                     </div>
                   )}
                 </div>
