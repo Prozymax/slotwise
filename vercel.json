@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npx kendo-ui-license activate && npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": "vite",
