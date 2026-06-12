@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import logo from "../public/logo.png";
+import logo from "/logo.png";
 
 function useAnimatedNumber(target: number, ms = 650) {
   const [value, setValue] = useState(target);
