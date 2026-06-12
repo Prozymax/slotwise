@@ -11,4 +11,8 @@ kendo-ui-license.txt
 .DS_Store
 *.local
 d1.png
-*.png
+d1_debug.png
+d2.png
+d3.png
+final.png
+screenshot_*.png
