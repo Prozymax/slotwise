@@ -2022,6 +2022,7 @@ body {
   .reset-btn {
     align-self: center;
     width: 100%;
+    max-width: 300px;
     justify-content: center;
   }
 
@@ -2034,14 +2035,24 @@ body {
     padding: 16px 24px;
   }
 
-  /* Attendee badge */
-  .attendee-badge {
-    justify-content: center;
+  /* Right section - center on mobile */
+  .header-right {
+    align-items: center;
+    width: 100%;
   }
 
-  /* Stats grid - 2 columns on mobile */
+  /* Attendee badge - full width centered */
+  .attendee-badge {
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  /* Stats grid - 2 columns centered */
   .stat-grid {
     grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    max-width: 400px;
   }
 
   .stat-item {
