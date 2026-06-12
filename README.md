@@ -1,105 +1,213 @@
-# Slotwise — demand-aware conference agenda builder
+# Slotwise
 
-Multi-track event agendas are built in spreadsheets, blind to the preference data that
-registration already captured. Result: the two most popular talks clash, a 289-person
-session gets an 80-seat room, and attendees discover it on event day.
+## Designing conferences people actually remember
 
-**Slotwise** lets organisers drag sessions on a scheduling board and watch attendee
-clashes and room overflows resolve **live** — 1,200 attendee preference sets re-scored
-on every drop, one animation frame per drag.
+Most conferences are built with spreadsheets, intuition, and a lot of last-minute decisions.
 
----
+Organisers spend weeks arranging sessions, assigning rooms, coordinating speakers, and trying to avoid conflicts. Despite all of that effort, attendees still end up facing difficult choices between overlapping sessions, overcrowded rooms, inaccessible experiences, and missed opportunities to connect with people who share their interests.
 
-## Setup (3 commands)
+The schedule of an event shapes almost everything about the attendee experience. It determines what people learn, who they meet, how engaged they remain throughout the day, and whether they leave feeling that the event was worth their time.
 
-```bash
-npm ci
-# Activate your Kendo license (free trial at telerik.com → npx kendo-ui-license activate)
-npm run dev
-```
+Yet one of the most important parts of organising a conference is still largely based on guesswork.
 
-The app loads with a deliberately broken agenda (**729 attendees impacted, 3 overflows**).
-Run `npm run verify-demo` to confirm the exact demo drag path.
+Slotwise was built to change that.
 
----
+## What is Slotwise?
 
-## The demo arc
+Slotwise is a conference intelligence platform that helps organisers design better events before they happen.
 
-| Step | Action | Impacted | Seats short | Overflows |
-|------|--------|----------|-------------|-----------|
-| Start | Broken import | **729** | 366 | 3 |
-| Drag 1 | Fine-Tuning → Main Hall @ 10:00 | 574 | 293 | 2 |
-| Drag 2 | LLMs in Production → Main Hall @ 9:00 | 496 | 114 | 1 |
-| Drag 3 | React Server Components → Main Hall @ 13:00 | **186** | **0** | **0** |
+Rather than simply displaying sessions on a calendar, Slotwise allows organisers to understand the impact of their decisions in real time. As sessions are arranged and adjusted, organisers receive immediate feedback on how those choices affect attendee experiences across the event.
 
-Three drags. 543 fewer impacted attendees. Zero overflows.
+It helps answer questions such as:
 
----
+* Are two highly anticipated sessions competing against each other?
+* Will a room exceed its capacity?
+* Are attendees being forced to choose between topics they care about?
+* Are networking opportunities being unintentionally reduced?
+* Are accessibility needs being overlooked?
+* How can we improve the overall flow of the conference?
 
-## How it works
+By turning scheduling into an interactive decision-making process, Slotwise helps organisers create conferences that are more intentional, inclusive, and meaningful.
 
-**The broken-pipe insight:** registration systems capture rich preference data (which
-sessions attendees want), but scheduling tools ignore it entirely. Slotwise closes that
-loop:
+## The problem
 
-1. **Import** attendee preferences at startup (1,200 attendees × 3 picks each, from a
-   deterministic synthetic dataset that mimics a real Eventbrite/Sessionize export).
-2. **Score** the agenda: for each attendee, count how many preferred sessions clash
-   (same time slot). Count overflow: expected turnout vs room capacity.
-3. **Re-score on every drag** — `computeStats` is a pure function (`useMemo` dep on
-   `assignments`). On n = 1,200 attendees with 3 prefs each, one pass through is ≈ 3ms.
-   The hero counter animates while you drag.
+Tech conferences have evolved significantly over the years.
 
-The engine is exact counting (Maps, O(1) lookups), not ML. That's a feature: explainable,
-instant, deterministic, trustworthy.
+The expectations of attendees have changed. People no longer attend events simply to sit through presentations. They attend to learn, discover new ideas, build relationships, find opportunities, and become part of a community.
 
----
+At the same time, organising conferences has become increasingly complex.
 
-## Kendo UI components used
+A single event may involve:
 
-- **Scheduler** — drag-and-drop agenda board with vertical room grouping
-- **Grid** — session table with custom status, demand, and clash-partner cells
-- **Chart** — utilisation bar chart with interactive tooltips and overflow bands
-- **TabStrip** — three-tab layout (Agenda board / Room load / Sessions)
-- **Notification** — per-drag toast with before/after diff
+* Multiple tracks running simultaneously
+* Hundreds or thousands of attendees
+* Speakers with different requirements
+* Limited room capacities
+* Accessibility accommodations
+* Sponsor commitments
+* Networking activities
+* Community expectations
 
----
+Despite this complexity, many organisers still rely on spreadsheets, disconnected tools, and manual adjustments.
 
-## What's real vs. simulated
+The result is often familiar:
 
-| Thing | Reality |
-|---|---|
-| Preference data | Synthetic, seeded deterministically (seed 20260718). Clustered to simulate real attendee behaviour. Framed as a registration import — which is exactly the real integration path. |
-| Scoring engine | Exact counting, no approximation |
-| Drag-and-drop | Live KendoReact Scheduler; falls back to custom HTML5 DnD if needed |
-| Backend | None — client-only SPA by design |
+* Popular sessions overlap.
+* Attendees miss talks they care about.
+* Rooms become overcrowded.
+* Valuable networking opportunities disappear.
+* Accessibility considerations are handled too late.
+* Feedback arrives only after the event has ended.
 
----
+By then, there is little that can be done.
 
-## Tech stack
+## Our approach
 
-- React 18 + TypeScript, Vite
-- KendoReact 15.0.0 (same major across all `@progress/kendo-react-*` packages)
-- `@progress/kendo-data-query` for Grid sort/filter
-- Vitest 2.1.9 — 23 unit tests lock the demo math in CI
+Slotwise treats conference planning as an experience design challenge rather than a scheduling exercise.
 
----
+The goal is not simply to produce a timetable.
 
-## Roadmap
+The goal is to help organisers understand the human impact of every scheduling decision before attendees ever walk through the doors.
 
-- **Auto-suggest fixes** — the engine already scores any candidate move; a greedy swap
-  search over unscheduled slots could surface "drag session X here to save 120 people"
-- **Live re-scheduling** — re-run after room capacity changes are confirmed on event day
-- **Real import** — Eventbrite/Sessionize API integration (same data shape as synthetic set)
+As organisers build their agenda, Slotwise continuously analyses the event and highlights opportunities for improvement.
 
----
+Instead of asking:
 
-## Security notes
+> "Does this schedule work?"
 
-`npm audit` reports 4 moderate + 1 critical vulnerability in the `esbuild ≤ 0.24.2`
-chain (CVE GHSA-67mh-4wv8-2f99). The fix requires Vite 8 which is a breaking change.
-These only affect the **dev server** (an attacker on localhost could probe it) — the
-production `npm run build` output is static assets with no server. Safe for a demo environment.
+Slotwise encourages organisers to ask:
 
-No secrets are committed. The Kendo license is activated via `npx kendo-ui-license activate`
-which patches `node_modules` in-place; the license file is in `.gitignore`.
+> "Is this the best possible experience we can create?"
+
+## Key features
+
+### Interactive schedule planning
+
+Organisers can build and modify conference agendas using an intuitive drag and drop interface.
+
+Sessions can be moved between time slots and rooms while maintaining a clear overview of the entire event.
+
+### Real-time event insights
+
+Every scheduling decision updates live indicators that reveal how the event experience is changing.
+
+Examples include:
+
+* Session conflict detection
+* Room capacity monitoring
+* Discovery opportunities
+* Accessibility considerations
+* Overall attendee experience indicators
+
+### Attendee journey simulation
+
+One of Slotwise's most important capabilities is its ability to simulate how different types of attendees may experience the conference.
+
+Organisers can explore example journeys based on interests and goals.
+
+For example:
+
+A frontend developer interested in artificial intelligence and networking opportunities may encounter:
+
+* Two preferred sessions occurring simultaneously
+* Long periods without meaningful interactions
+* Consecutive technical sessions leading to fatigue
+
+Slotwise surfaces these patterns early and recommends improvements.
+
+### Schedule optimisation
+
+Based on the available information, Slotwise identifies opportunities to improve the event experience.
+
+Recommendations may include:
+
+* Reducing conflicts between high-interest sessions
+* Reassigning rooms to better match expected attendance
+* Improving attendee flow across tracks
+* Introducing networking opportunities at more effective moments
+* Creating a more balanced conference experience
+
+### Accessibility awareness
+
+Accessibility information collected during registration often remains disconnected from planning decisions.
+
+Slotwise ensures these considerations remain visible throughout the planning process.
+
+Organisers are encouraged to account for attendee needs from the earliest stages of event design.
+
+### Meaningful experience metrics
+
+Rather than focusing exclusively on operational efficiency, Slotwise introduces experience-focused indicators that encourage organisers to consider:
+
+* Learning opportunities
+* Content discovery
+* Inclusivity
+* Community interaction
+* Engagement balance
+
+## Why this matters
+
+The quality of a conference is rarely determined by the strength of a single keynote.
+
+It is shaped by hundreds of small decisions.
+
+Which sessions overlap.
+
+Which rooms are selected.
+
+When breaks occur.
+
+How people move through the venue.
+
+Whether newcomers feel welcome.
+
+Whether attendees have opportunities to connect.
+
+These decisions influence whether an event feels energising or exhausting, memorable or forgettable.
+
+Slotwise helps organisers make those decisions with greater confidence.
+
+## Built with Kendo UI
+
+A polished and interactive experience is central to Slotwise.
+
+Kendo UI enables organisers to engage directly with their event plans through responsive and intuitive interfaces.
+
+It powers the visual experiences that make planning feel immediate and understandable.
+
+Potential implementations include:
+
+* Interactive scheduling experiences
+* Dynamic charts and analytics
+* Data visualisation components
+* Contextual dialogs and recommendations
+* Responsive layouts for different devices
+
+## Future opportunities
+
+While Slotwise is designed as a hackathon project, its vision extends beyond a single event.
+
+Future capabilities could include:
+
+* Integration with conference registration platforms
+* Speaker management workflows
+* Volunteer coordination
+* Sponsor engagement insights
+* Personalised attendee recommendations
+* Real attendee preference analysis
+* Cross-event benchmarking
+* Hybrid event optimisation
+
+Over time, Slotwise could become a central operating layer for modern conferences.
+
+## Conclusion
+
+Conferences bring people together to learn, connect, and build communities.
+
+The schedule behind those experiences deserves more than spreadsheets and educated guesses.
+
+Slotwise empowers organisers to move beyond simply arranging sessions and begin intentionally designing experiences that attendees will remember long after the event ends.
+
+Because better conferences do not happen by accident.
+
+They are designed.
