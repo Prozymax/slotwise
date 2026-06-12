@@ -81,33 +81,39 @@ export default function SchedulerBoard({ assignments, stats, data, onMove }) {
   );
 
   return (
-    <div className="board-wrap">
-      <RoomCapacityPanel
-        rooms={data.rooms}
-        slots={data.slots}
-        utilization={stats.utilization}
-      />
-      <Scheduler
-        data={items}
-        defaultDate={EVENT.date}
-        editable={{ add: false, remove: false, drag: true, resize: false, edit: false, select: false }}
-        onDataChange={handleDataChange}
-        group={{ resources: ["Rooms"], orientation: "vertical" }}
-        resources={resources}
-        height={"calc(100vh - 360px)"}
-      >
-        <DayView
-          workDayStart="09:00"
-          workDayEnd="17:00"
-          slotDuration={60}
-          slotDivisions={1}
-          showWorkHours={true}
+    <div className="board-layout-horizontal">
+      <div className="board-sidebar">
+        <RoomCapacityPanel
+          rooms={data.rooms}
+          slots={data.slots}
+          utilization={stats.utilization}
         />
-      </Scheduler>
-      <p className="board-hint">
-        Drag a session to a new room or time — clash and capacity scores update instantly.
-        12:00 is lunch and cannot be booked.
-      </p>
+      </div>
+      <div className="board-main">
+        <div className="board-wrap">
+          <Scheduler
+            data={items}
+            defaultDate={EVENT.date}
+            editable={{ add: false, remove: false, drag: true, resize: false, edit: false, select: false }}
+            onDataChange={handleDataChange}
+            group={{ resources: ["Rooms"], orientation: "vertical" }}
+            resources={resources}
+            height={"calc(100vh - 280px)"}
+          >
+            <DayView
+              workDayStart="09:00"
+              workDayEnd="17:00"
+              slotDuration={60}
+              slotDivisions={1}
+              showWorkHours={true}
+            />
+          </Scheduler>
+          <p className="board-hint">
+            Drag a session to a new room or time — clash and capacity scores update instantly.
+            12:00 is lunch and cannot be booked.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

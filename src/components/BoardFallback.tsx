@@ -35,77 +35,82 @@ export default function BoardFallback({ assignments, stats, data, onMove }) {
     );
 
   return (
-    <div className="fb-board">
-      <RoomCapacityPanel
-        rooms={data.rooms}
-        slots={data.slots}
-        utilization={stats.utilization}
-      />
-
-      {/* Standard calendar: rooms = columns, time = rows */}
-      <div
-        className="fb-cal"
-        style={{ gridTemplateColumns: `64px repeat(${data.rooms.length}, 1fr)` }}
-      >
-        {/* ── Header row: corner + room names ── */}
-        <div className="fb-cal-corner" />
-        {data.rooms.map((room) => (
-          <div key={room.id} className="fb-cal-room-head">
-            <span className="fb-cal-room-bar" style={{ background: room.color }} />
-            <span className="fb-cal-room-name">{room.name}</span>
-            <span className="fb-cal-room-cap">{room.capacity} seats</span>
-          </div>
-        ))}
-
-        {/* ── Time rows ── */}
-        {data.slots.map((slot, si) => (
-          <Fragment key={si}>
-            <div className="fb-cal-time">{slot.label}</div>
-
-            {data.rooms.map((room, ri) => {
-              const s    = cellSession(room.id, si);
-              const key  = `${room.id}:${si}`;
-              const util = stats.utilization[ri][si];
-              const remaining = room.capacity - (util?.expected ?? 0);
-
-              return (
-                <div
-                  key={key}
-                  className={`fb-cal-cell ${hover === key ? "fb-cal-hover" : ""}`}
-                  onDragOver={(e) => { e.preventDefault(); setHover(key); }}
-                  onDragLeave={() => setHover((h) => (h === key ? null : h))}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setHover(null);
-                    if (dragId) onMove(dragId, room.id, si);
-                    setDragId(null);
-                  }}
-                >
-                  {s ? (
-                    <SessionCard
-                      session={s}
-                      room={room}
-                      demand={data.demand}
-                      overflowIds={overflowIds}
-                      clashPartners={clashPartners}
-                      remaining={remaining}
-                      dragId={dragId}
-                      setDragId={setDragId}
-                      setHover={setHover}
-                    />
-                  ) : (
-                    <div className="fb-cal-empty" />
-                  )}
-                </div>
-              );
-            })}
-          </Fragment>
-        ))}
+    <div className="board-layout-horizontal">
+      <div className="board-sidebar">
+        <RoomCapacityPanel
+          rooms={data.rooms}
+          slots={data.slots}
+          utilization={stats.utilization}
+        />
       </div>
+      <div className="board-main">
+        <div className="fb-board">
+          {/* Standard calendar: rooms = columns, time = rows */}
+          <div
+            className="fb-cal"
+            style={{ gridTemplateColumns: `64px repeat(${data.rooms.length}, 1fr)` }}
+          >
+            {/* ── Header row: corner + room names ── */}
+            <div className="fb-cal-corner" />
+            {data.rooms.map((room) => (
+              <div key={room.id} className="fb-cal-room-head">
+                <span className="fb-cal-room-bar" style={{ background: room.color }} />
+                <span className="fb-cal-room-name">{room.name}</span>
+                <span className="fb-cal-room-cap">{room.capacity} seats</span>
+              </div>
+            ))}
 
-      <p className="board-hint" style={{ color: "rgba(255,255,255,0.28)", marginTop: 10 }}>
-        Drag a session to any cell — drop on an occupied cell to swap. Scores update instantly.
-      </p>
+            {/* ── Time rows ── */}
+            {data.slots.map((slot, si) => (
+              <Fragment key={si}>
+                <div className="fb-cal-time">{slot.label}</div>
+
+                {data.rooms.map((room, ri) => {
+                  const s    = cellSession(room.id, si);
+                  const key  = `${room.id}:${si}`;
+                  const util = stats.utilization[ri][si];
+                  const remaining = room.capacity - (util?.expected ?? 0);
+
+                  return (
+                    <div
+                      key={key}
+                      className={`fb-cal-cell ${hover === key ? "fb-cal-hover" : ""}`}
+                      onDragOver={(e) => { e.preventDefault(); setHover(key); }}
+                      onDragLeave={() => setHover((h) => (h === key ? null : h))}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setHover(null);
+                        if (dragId) onMove(dragId, room.id, si);
+                        setDragId(null);
+                      }}
+                    >
+                      {s ? (
+                        <SessionCard
+                          session={s}
+                          room={room}
+                          demand={data.demand}
+                          overflowIds={overflowIds}
+                          clashPartners={clashPartners}
+                          remaining={remaining}
+                          dragId={dragId}
+                          setDragId={setDragId}
+                          setHover={setHover}
+                        />
+                      ) : (
+                        <div className="fb-cal-empty" />
+                      )}
+                    </div>
+                  );
+                })}
+              </Fragment>
+            ))}
+          </div>
+
+          <p className="board-hint" style={{ color: "rgba(255,255,255,0.28)", marginTop: 10 }}>
+            Drag a session to any cell — drop on an occupied cell to swap. Scores update instantly.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

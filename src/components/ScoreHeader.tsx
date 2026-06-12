@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
+import logo from "../public/logo.png";
 
 function useAnimatedNumber(target: number, ms = 650) {
   const [value, setValue] = useState(target);
@@ -21,55 +22,114 @@ function useAnimatedNumber(target: number, ms = 650) {
   return value;
 }
 
-export default function ScoreHeader({ stats, attendeeCount, eventName, onReset }) {
+export default function ScoreHeader({
+  stats,
+  attendeeCount,
+  eventName,
+  onReset,
+}) {
   const impacted = stats.affected + stats.seatsShort;
   const shown = useAnimatedNumber(impacted);
   const severity = impacted > 500 ? "bad" : impacted > 250 ? "warn" : "good";
 
   return (
     <header className="score-header">
-      <div className="brand">
-        <div className="brand-mark">◫</div>
-        <div className="brand-text">
-          <div className="brand-name">Slotwise</div>
-          <div className="brand-sub">
-            {eventName} ·{" "}
-            <span className="import-badge">
-              ✓ {attendeeCount.toLocaleString()} registrations imported
-            </span>
+      <div className="header-left">
+        <div className="brand">
+          <img src={logo} alt="Slotwise" className="brand-logo" />
+          <div className="brand-text">
+            <div className="brand-name">Slotwise</div>
+            <div className="brand-sub">{eventName}</div>
           </div>
-          <button className="reset-btn" onClick={onReset}>↺ Reset agenda</button>
+        </div>
+        <button type="button" className="reset-btn" onClick={onReset}>
+          <span className="reset-icon">↺</span>
+          Reset agenda
+        </button>
+      </div>
+
+      <div className="header-center">
+        <div className={`hero-score hero-${severity}`}>
+          <div className="hero-number">{shown.toLocaleString()}</div>
+          <div className="hero-label">attendees impacted</div>
         </div>
       </div>
 
-      <div className={`hero-score hero-${severity}`}>
-        <div className="hero-number">{shown.toLocaleString()}</div>
-        <div className="hero-label">attendees impacted by this layout</div>
-      </div>
+      <div className="header-right">
+        <div className="attendee-badge">
+          <div className="attendee-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="9"
+                cy="7"
+                r="4"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div className="attendee-info">
+            <div className="attendee-count">
+              {attendeeCount.toLocaleString()}
+            </div>
+            <div className="attendee-label">Total Attendees</div>
+          </div>
+        </div>
 
-      <div className="stat-tiles">
-        <div className={`tile ${stats.affected > 250 ? "tile-bad" : "tile-good"}`}>
-          <div className="tile-value">{stats.affected.toLocaleString()}</div>
-          <div className="tile-label">schedule clashes</div>
-        </div>
-        <div className={`tile ${stats.seatsShort > 0 ? "tile-bad" : "tile-good"}`}>
-          <div className="tile-value">{stats.seatsShort.toLocaleString()}</div>
-          <div className="tile-label">seats short</div>
-        </div>
-        <div className={`tile ${stats.overflows.length > 0 ? "tile-bad" : "tile-good"}`}>
-          <div className="tile-value">{stats.overflows.length}</div>
-          <div className="tile-label">rooms over capacity</div>
-        </div>
-        <div className={`tile ${stats.speakerConflicts.length > 0 ? "tile-bad" : "tile-good"}`}>
-          <div className="tile-value">{stats.speakerConflicts.length}</div>
-          <div className="tile-label">speaker conflicts</div>
+        <div className="stat-grid">
+          <div
+            className={`stat-item ${stats.affected > 250 ? "stat-bad" : "stat-good"}`}
+          >
+            <div className="stat-value">{stats.affected.toLocaleString()}</div>
+            <div className="stat-label">Clashes</div>
+          </div>
+          <div
+            className={`stat-item ${stats.seatsShort > 0 ? "stat-bad" : "stat-good"}`}
+          >
+            <div className="stat-value">
+              {stats.seatsShort.toLocaleString()}
+            </div>
+            <div className="stat-label">Seats Short</div>
+          </div>
+          <div
+            className={`stat-item ${stats.overflows.length > 0 ? "stat-bad" : "stat-good"}`}
+          >
+            <div className="stat-value">{stats.overflows.length}</div>
+            <div className="stat-label">Overflows</div>
+          </div>
+          <div
+            className={`stat-item ${stats.speakerConflicts.length > 0 ? "stat-bad" : "stat-good"}`}
+          >
+            <div className="stat-value">{stats.speakerConflicts.length}</div>
+            <div className="stat-label">Conflicts</div>
+          </div>
         </div>
       </div>
 
       {stats.worstPair && stats.worstPair.count > 40 && (
-        <div className="worst-clash">
-          ⚡ Worst clash: <b>{stats.worstPair.titles[0]}</b> vs{" "}
-          <b>{stats.worstPair.titles[1]}</b> — {stats.worstPair.count} attendees want both
+        <div className="worst-clash-banner">
+          {/* <span className="clash-icon"></span> */}
+          <span className="clash-text">
+            Worst clash: <strong>{stats.worstPair.titles[0]}</strong> vs{" "}
+            <strong>{stats.worstPair.titles[1]}</strong> —{" "}
+            {stats.worstPair.count} attendees want both
+          </span>
         </div>
       )}
     </header>

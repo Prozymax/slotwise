@@ -4,7 +4,7 @@
 export const PERSONAS = [
   {
     id: "prosper",
-    name: "Prosper Adeniyi",
+    name: "Prosper Maxwell",
     role: "Fullstack Developer",
     interests: ["AI", "React", "TypeScript"],
     avatar: "💻",
@@ -24,7 +24,7 @@ export const PERSONAS = [
   },
   {
     id: "emeka",
-    name: "Emeka Peters",
+    name: "George Peters",
     role: "Startup Founder",
     interests: ["AI", "Career Growth", "Side Projects"],
     avatar: "🚀",
@@ -43,7 +43,7 @@ export const PERSONAS = [
   },
   {
     id: "aisha",
-    name: "Aisha Balogun",
+    name: "Aisha Ismaila",
     role: "Engineering Manager",
     interests: ["Career", "Leadership", "Team Wellbeing"],
     avatar: "📋",
